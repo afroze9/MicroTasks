@@ -1,7 +1,6 @@
-namespace MicroTasks.CompanyApi.Models
+namespace MicroTasks.CompanyApi.Models;
+
+public class TagDto
 {
-    public class TagDto
-    {
-        public string Value { get; set; } = string.Empty;
-    }
+    public string Value { get; set; } = string.Empty;
 }

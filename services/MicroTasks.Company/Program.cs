@@ -21,7 +21,7 @@ app.MapDefaultEndpoints();
 // Seed initial TodoItems if database is empty
 using (IServiceScope scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<CompanyDbContext>();
+    CompanyDbContext db = scope.ServiceProvider.GetRequiredService<CompanyDbContext>();
     DbSeeder.Seed(db);
 }
 
