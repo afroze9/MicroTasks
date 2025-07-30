@@ -12,6 +12,7 @@ public class Company
     public bool IsActive { get; private set; }
 
     // DDD: Constructor for new Company
+    private Company() { }
     public Company(string name, IEnumerable<Tag>? tags = null)
     {
         Id = Guid.NewGuid();
