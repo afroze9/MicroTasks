@@ -1,4 +1,4 @@
-namespace MicroTasks.Company.Models
+namespace MicroTasks.CompanyApi.Models
 {
     public class TodoItem
     {

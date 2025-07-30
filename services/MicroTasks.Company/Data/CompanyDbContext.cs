@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using MicroTasks.Company.Models;
+using MicroTasks.CompanyApi.Models;
 
-namespace MicroTasks.Company.Data
+namespace MicroTasks.CompanyApi.Data
 {
     public class CompanyDbContext : DbContext
     {
         public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options) { }
 
         public DbSet<TodoItem> TodoItems => Set<TodoItem>();
+        public DbSet<Company> Companies => Set<Company>();
     }
 }

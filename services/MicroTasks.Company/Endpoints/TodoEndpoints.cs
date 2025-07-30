@@ -1,21 +1,20 @@
-using MicroTasks.Company.Models;
-using MicroTasks.Company.Data;
+using MicroTasks.CompanyApi.Models;
+using MicroTasks.CompanyApi.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Concurrent;
 
-namespace MicroTasks.Company.Endpoints
+namespace MicroTasks.CompanyApi.Endpoints
 {
     public static class TodoEndpoints
     {
         public static RouteGroupBuilder MapTodoEndpoints(this IEndpointRouteBuilder app)
         {
-            var todoGroup = app.MapGroup("/todos");
+            RouteGroupBuilder todoGroup = app.MapGroup("/todos");
 
-            todoGroup.MapGet("/", async (CompanyDbContext db) => await GetAllTodos(db));
-            todoGroup.MapGet("/{id:guid}", async (CompanyDbContext db, Guid id) => await GetTodoById(db, id));
-            todoGroup.MapPost("/", async (CompanyDbContext db, TodoItem todo) => await CreateTodo(db, todo));
-            todoGroup.MapPut("/{id:guid}", async (CompanyDbContext db, Guid id, TodoItem updated) => await UpdateTodo(db, id, updated));
-            todoGroup.MapDelete("/{id:guid}", async (CompanyDbContext db, Guid id) => await DeleteTodo(db, id));
+            todoGroup.MapGet("/", GetAllTodos);
+            todoGroup.MapGet("/{id:guid}", GetTodoById);
+            todoGroup.MapPost("/", CreateTodo);
+            todoGroup.MapPut("/{id:guid}", UpdateTodo);
+            todoGroup.MapDelete("/{id:guid}", DeleteTodo);
 
             return todoGroup;
         }
@@ -25,7 +24,7 @@ namespace MicroTasks.Company.Endpoints
 
         private static async Task<IResult> GetTodoById(CompanyDbContext db, Guid id)
         {
-            var item = await db.TodoItems.FindAsync(id);
+            TodoItem? item = await db.TodoItems.FindAsync(id);
             return item is not null ? Results.Ok(item) : Results.NotFound();
         }
 
@@ -42,7 +41,7 @@ namespace MicroTasks.Company.Endpoints
 
         private static async Task<IResult> UpdateTodo(CompanyDbContext db, Guid id, TodoItem updated)
         {
-            var existing = await db.TodoItems.FindAsync(id);
+            TodoItem? existing = await db.TodoItems.FindAsync(id);
             if (existing is null) return Results.NotFound();
             existing.Title = updated.Title;
             existing.Description = updated.Description;
@@ -55,7 +54,7 @@ namespace MicroTasks.Company.Endpoints
 
         private static async Task<IResult> DeleteTodo(CompanyDbContext db, Guid id)
         {
-            var item = await db.TodoItems.FindAsync(id);
+            TodoItem? item = await db.TodoItems.FindAsync(id);
             if (item is null) return Results.NotFound();
             db.TodoItems.Remove(item);
             await db.SaveChangesAsync();

@@ -2,5 +2,6 @@ IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(ar
 IResourceBuilder<PostgresServerResource> postgres = builder.AddPostgres("companydb");
 
 builder.AddProject<Projects.MicroTasks_Company>("company")
+    .WaitFor(postgres)
     .WithReference(postgres);
 builder.Build().Run();

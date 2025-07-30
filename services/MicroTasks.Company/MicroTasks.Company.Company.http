@@ -1,0 +1,47 @@
+@MicroTasks.Company_HostAddress = http://localhost:5131
+
+# Fetch all companies
+GET {{MicroTasks.Company_HostAddress}}/companies
+Accept: application/json
+
+###
+# Fetch a company by ID
+GET {{MicroTasks.Company_HostAddress}}/companies/3cd69057-f1ff-4d03-badd-7e0aa6837829
+Accept: application/json
+
+###
+
+# Create a new company
+POST {{MicroTasks.Company_HostAddress}}/companies
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "NewCo",
+  "tags": [
+    { "value": "demo" },
+    { "value": "test" }
+  ]
+}
+
+###
+
+# Update an existing company
+PUT {{MicroTasks.Company_HostAddress}}/companies/3cd69057-f1ff-4d03-badd-7e0aa6837829
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "UpdatedCo",
+  "tags": [
+    { "value": "updated" },
+    { "value": "enterprise" }
+  ]
+}
+
+###
+# Delete a company
+DELETE {{MicroTasks.Company_HostAddress}}/companies/44acef65-21ad-4d84-9851-aae55a202707
+Accept: application/json
+
+###
