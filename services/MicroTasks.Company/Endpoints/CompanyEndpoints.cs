@@ -1,6 +1,7 @@
 using MicroTasks.CompanyApi.Data;
 using Microsoft.EntityFrameworkCore;
 using MicroTasks.CompanyApi.Models;
+using MicroTasks.CompanyApi.Dtos;
 
 namespace MicroTasks.CompanyApi.Endpoints;
 
@@ -31,7 +32,7 @@ public static class CompanyEndpoints
     private static async Task<IResult> CreateCompany(CompanyDbContext db, CompanyDto dto)
     {
         List<Tag> tags = new List<Tag>();
-        if (dto.Tags != null && dto.Tags.Any())
+        if (dto.Tags != null && dto.Tags.Count != 0)
         {
             List<string> tagValues = dto.Tags.Select(t => t.Value).Where(v => !string.IsNullOrWhiteSpace(v)).Distinct().ToList();
             List<Tag> existingTags = await db.Tags.Where(t => tagValues.Contains(t.Value)).ToListAsync();
@@ -60,7 +61,7 @@ public static class CompanyEndpoints
         if (existing is null) return Results.NotFound();
         existing.ChangeName(dto.Name);
         List<Tag> tags = new List<Tag>();
-        if (dto.Tags != null && dto.Tags.Any())
+        if (dto.Tags != null && dto.Tags.Count != 0)
         {
             List<string> tagValues = dto.Tags.Select(t => t.Value).Where(v => !string.IsNullOrWhiteSpace(v)).Distinct().ToList();
             List<Tag> existingTags = await db.Tags.Where(t => tagValues.Contains(t.Value)).ToListAsync();

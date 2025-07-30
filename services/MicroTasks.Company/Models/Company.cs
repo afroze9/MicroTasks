@@ -28,9 +28,6 @@ public class Company
         IsActive = true;
     }
 
-    // DDD: For EF Core
-    private Company() { }
-
     // Business logic
     public void AddTag(Tag tag)
     {

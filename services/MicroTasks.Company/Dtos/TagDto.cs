@@ -1,4 +1,4 @@
-namespace MicroTasks.CompanyApi.Models;
+namespace MicroTasks.CompanyApi.Dtos;
 
 public class TagDto
 {
