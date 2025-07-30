@@ -15,4 +15,8 @@
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\services\MicroTasks.Company\MicroTasks.Company.csproj" />
+  </ItemGroup>
+
 </Project>
