@@ -1,6 +1,40 @@
 @MicroTasks.Company_HostAddress = http://localhost:5131
 
-GET {{MicroTasks.Company_HostAddress}}/weatherforecast/
+# Fetch all todo items
+GET {{MicroTasks.Company_HostAddress}}/todos
+Accept: application/json
+
+###
+# Fetch a todo item by ID
+GET {{MicroTasks.Company_HostAddress}}/todos/01985a6d-7ae4-76c0-8988-020994b6a7a6
+Accept: application/json
+
+###
+# Create a new todo item
+POST {{MicroTasks.Company_HostAddress}}/todos
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Test Task",
+  "isCompleted": false
+}
+
+###
+# Update an existing todo item
+PUT {{MicroTasks.Company_HostAddress}}/todos/114420b1-39c1-4d85-b039-1b3def379c92
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": "114420b1-39c1-4d85-b039-1b3def379c92",
+  "title": "Updated Task",
+  "isCompleted": true
+}
+
+###
+# Delete a todo item
+DELETE {{MicroTasks.Company_HostAddress}}/todos/1
 Accept: application/json
 
 ###
