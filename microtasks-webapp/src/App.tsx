@@ -1,35 +1,61 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
+import { fetchCompanies } from "./services/companyService";
+import type { Company } from "./services/companyService";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    fetchCompanies()
+      .then(setCompanies)
+      .catch((err) => setError(err.message));
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <h1>Companies</h1>
+
+      <div className="read-the-docs">
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Name</th>
+              <th style={{ border: "1px solid #ccc", padding: "8px" }}>
+                Created At
+              </th>
+              <th style={{ border: "1px solid #ccc", padding: "8px" }}>
+                Updated At
+              </th>
+              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Tags</th>
+            </tr>
+          </thead>
+          <tbody>
+            {companies.map((company) => (
+              <tr key={company.id}>
+                <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                  {company.name}
+                </td>
+                <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                  {company.createdAt.toLocaleString()}
+                </td>
+                <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                  {company.updatedAt.toLocaleString()}
+                </td>
+                <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                  {company.tags && company.tags.length > 0
+                    ? company.tags.map((tag) => tag.value).join(", ")
+                    : "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
