@@ -1,8 +1,9 @@
 using MicroTasks.CompanyApi.Dtos;
+using Xunit;
 
-namespace MicroTasks.CompanyApi.Tests;
+namespace MicroTasks.CompanyApi.Tests.Dtos;
 
-public class DtoTests
+public class CompanyDtoTests
 {
     [Fact]
     public void CompanyDto_Defaults_AreValid()
@@ -11,13 +12,6 @@ public class DtoTests
         Assert.Equal(string.Empty, dto.Name);
         Assert.NotNull(dto.Tags);
         Assert.Empty(dto.Tags);
-    }
-
-    [Fact]
-    public void TagDto_CanBeConstructedAndAssigned()
-    {
-        var tag = new TagDto { Value = "demo" };
-        Assert.Equal("demo", tag.Value);
     }
 
     [Fact]
