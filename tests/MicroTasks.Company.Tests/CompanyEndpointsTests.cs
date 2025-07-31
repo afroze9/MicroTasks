@@ -1,4 +1,4 @@
-namespace MicroTasks.Company.Tests;
+namespace MicroTasks.CompanyApi.Tests;
 
 using System;
 using System.Threading;
