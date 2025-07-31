@@ -1,1 +1,3 @@
-{}
+{
+    "dotnet.defaultSolution": "MicroTasks.slnx"
+}

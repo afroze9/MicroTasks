@@ -20,9 +20,11 @@ Make sure to use the appropriate folder structure for the project.
 
 - **Service Boundaries**: Each service (e.g., `MicroTasks.Company`) is isolated in its own folder under `services/`.
 - **Models**: Domain models (e.g., `TodoItem`) are placed in a `Models/` subfolder within each service.
+- **DTOs**: Data Transfer Objects (DTOs) are placed in a `Dtos/` subfolder within each service. Use DTOs for request/response payloads and mapping between domain models and API contracts.
 - **Endpoints**: Minimal API pattern using endpoint groups (`app.MapGroup`) for RESTful operations.
 - **Data Storage**: In-memory `ConcurrentDictionary` is used for demo purposes; replace with persistent storage for production.
 - **Configuration**: Service-specific settings in `appsettings.json` and `appsettings.Development.json`.
+- **Migrations**: For services using Entity Framework Core, place migration files in a `Migrations/` subfolder within each service. Use migrations to manage schema changes for each service's DbContext. Run migrations using standard EF Core CLI commands, targeting the specific service project.
 
 ## Developer Workflows
 
@@ -37,6 +39,15 @@ Make sure to use the appropriate folder structure for the project.
 - **OpenAPI**: Enabled in development via `app.MapOpenApi()`.
 - **Service Defaults**: Use `builder.AddServiceDefaults()` for common configuration.
 - **External Dependencies**: NuGet packages managed per project; see `.csproj` files.
+
+## DTOs Folder Convention
+
+- Place all DTO classes (e.g., `CompanyDto`, `TagDto`) in the `Dtos/` subfolder within each service.
+- Use DTOs for:
+  - Defining request and response shapes for API endpoints
+  - Abstracting domain models from external contracts
+  - Supporting mapping between models and API payloads
+- Keep DTOs simple and focused on serialization needs; avoid business logic in DTOs.
 
 ## Example: TodoItem CRUD
 

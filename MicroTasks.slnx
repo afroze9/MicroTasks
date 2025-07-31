@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/services/">
+    <Project Path="services/MicroTasks.Company/MicroTasks.Company.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MicroTasks.Company.Tests/MicroTasks.Company.Tests.csproj" />
+  </Folder>
+  <Project Path="MicroTasks.AppHost/MicroTasks.AppHost.csproj" />
+  <Project Path="MicroTasks.ServiceDefaults/MicroTasks.ServiceDefaults.csproj" />
+</Solution>

@@ -26,7 +26,6 @@ using (IServiceScope scope = app.Services.CreateScope())
 }
 
 // Register TodoItem endpoints using vertical slice best practices
-app.MapTodoEndpoints();
 app.MapCompanyEndpoints();
 
 app.Run();

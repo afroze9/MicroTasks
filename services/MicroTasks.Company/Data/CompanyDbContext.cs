@@ -7,7 +7,6 @@ public class CompanyDbContext : DbContext
 {
     public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options) { }
 
-    public DbSet<TodoItem> TodoItems => Set<TodoItem>();
     public DbSet<Company> Companies => Set<Company>();
     public DbSet<Tag> Tags => Set<Tag>();
 
