@@ -1,20 +1,32 @@
 import { useEffect, useState } from "react";
 import { fetchCompanies } from "../services/companyService";
 import type { Company } from "../services/companyService";
+import { useAuth } from "../auth/useAuth";
+import { Link } from "react-router-dom";
 
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [error, setError] = useState<string>("");
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
     fetchCompanies()
       .then(setCompanies)
       .catch((err) => setError(err.message));
-  }, []);
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return <p>Please log in to view companies.</p>;
+  }
 
   return (
     <>
       <h1>Companies</h1>
+      <Link to="/">Go to Home</Link>
       <div className="read-the-docs">
         {error && <p style={{ color: "red" }}>{error}</p>}
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
