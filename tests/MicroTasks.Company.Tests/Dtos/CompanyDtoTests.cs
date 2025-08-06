@@ -1,5 +1,4 @@
 using MicroTasks.CompanyApi.Dtos;
-using Xunit;
 
 namespace MicroTasks.CompanyApi.Tests.Dtos;
 

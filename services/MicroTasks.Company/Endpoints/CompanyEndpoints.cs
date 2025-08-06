@@ -11,11 +11,16 @@ public static class CompanyEndpoints
     {
         RouteGroupBuilder companyGroup = app.MapGroup("/companies");
 
-        companyGroup.MapGet("/", GetAllCompanies);
-        companyGroup.MapGet("/{id:guid}", GetCompanyById);
-        companyGroup.MapPost("/", CreateCompany);
-        companyGroup.MapPut("/{id:guid}", UpdateCompany);
-        companyGroup.MapDelete("/{id:guid}", DeleteCompany);
+        companyGroup.MapGet("/", GetAllCompanies)
+            .RequireAuthorization("CompanyRead");
+        companyGroup.MapGet("/{id:guid}", GetCompanyById)
+            .RequireAuthorization("CompanyRead");
+        companyGroup.MapPost("/", CreateCompany)
+            .RequireAuthorization("CompanyWrite");
+        companyGroup.MapPut("/{id:guid}", UpdateCompany)
+            .RequireAuthorization("CompanyWrite");
+        companyGroup.MapDelete("/{id:guid}", DeleteCompany)
+            .RequireAuthorization("CompanyDelete");
 
         return companyGroup;
     }

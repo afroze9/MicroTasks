@@ -1,6 +1,4 @@
 using MicroTasks.CompanyApi.Models;
-using Xunit;
-using System.Linq;
 
 namespace MicroTasks.CompanyApi.Tests.Models;
 

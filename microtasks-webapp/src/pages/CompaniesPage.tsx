@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchCompanies } from "../services/companyService";
+import { useCompanyService } from "../services/companyService";
 import type { Company } from "../services/companyService";
 import { useAuth } from "../auth/useAuth";
 import { Link } from "react-router-dom";
@@ -9,15 +9,15 @@ export default function CompaniesPage() {
   const [error, setError] = useState<string>("");
   const { isAuthenticated } = useAuth();
 
+  const { fetchCompanies } = useCompanyService();
   useEffect(() => {
     if (!isAuthenticated) {
       return;
     }
-
     fetchCompanies()
       .then(setCompanies)
       .catch((err) => setError(err.message));
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchCompanies]);
 
   if (!isAuthenticated) {
     return <p>Please log in to view companies.</p>;

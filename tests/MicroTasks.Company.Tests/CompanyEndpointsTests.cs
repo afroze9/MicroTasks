@@ -17,6 +17,8 @@ public class CompanyAppFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        // Enable mock authentication in the API for test runs
+        Environment.SetEnvironmentVariable("ASPIRE_TEST_AUTH", "1");
         IDistributedApplicationTestingBuilder builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.MicroTasks_AppHost>();
         builder.Services.ConfigureHttpClientDefaults(clientBuilder =>
         {
