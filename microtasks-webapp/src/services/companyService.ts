@@ -23,45 +23,130 @@ export type CompanyDto = {
   tags?: TagDto[];
 };
 
+type ServiceResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: string };
+
 export const useCompanyService = () => {
   const { token } = useAuth();
 
-  const fetchCompanies = useCallback(async (): Promise<Company[]> => {
+  const fetchCompanies = useCallback(async (): Promise<
+    ServiceResult<Company[]>
+  > => {
     const response = await fetch("/companies", {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
-
     if (!response.ok) {
-      let errorMessage = `Error: ${response.status}`;
-      try {
-        const errorBody = await response.json();
-        if (errorBody && errorBody.error) {
-          errorMessage = `${errorBody.error}${
-            errorBody.detail ? ": " + errorBody.detail : ""
-          }`;
-        }
-      } catch {
-        // Ignore JSON parse errors, fallback to status
-      }
-
-      if (response.status === 401) {
-        throw new Error("Unauthorized: Please log in.");
-      } else if (response.status === 403) {
-        throw new Error("Forbidden: You do not have access to this resource.");
-      } else if (response.status === 500) {
-        throw new Error("Server error. Please try again later.");
-      } else {
-        throw new Error(errorMessage);
-      }
+      const errorText = await response.text();
+      return { success: false, error: errorText };
     }
-
     const companies = await response.json();
-    return companies.map((c: Company) => ({
-      ...c,
-      createdAt: new Date(c.createdAt),
-      updatedAt: new Date(c.updatedAt),
-    }));
+    return {
+      success: true,
+      data: companies.map((c: Company) => ({
+        ...c,
+        createdAt: new Date(c.createdAt),
+        updatedAt: new Date(c.updatedAt),
+      })),
+    };
   }, [token]);
 
-  return { fetchCompanies };
+  const getCompanyById = useCallback(
+    async (id: string): Promise<ServiceResult<Company>> => {
+      const response = await fetch(`/companies/${id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        return { success: false, error: errorText };
+      }
+      const c = await response.json();
+      return {
+        success: true,
+        data: {
+          ...c,
+          createdAt: new Date(c.createdAt),
+          updatedAt: new Date(c.updatedAt),
+        },
+      };
+    },
+    [token]
+  );
+
+  const createCompany = useCallback(
+    async (dto: CompanyDto): Promise<ServiceResult<Company>> => {
+      const response = await fetch("/companies", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(dto),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        return { success: false, error: errorText };
+      }
+      const c = await response.json();
+      return {
+        success: true,
+        data: {
+          ...c,
+          createdAt: new Date(c.createdAt),
+          updatedAt: new Date(c.updatedAt),
+        },
+      };
+    },
+    [token]
+  );
+
+  const updateCompany = useCallback(
+    async (id: string, dto: CompanyDto): Promise<ServiceResult<Company>> => {
+      const response = await fetch(`/companies/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(dto),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        return { success: false, error: errorText };
+      }
+      const c = await response.json();
+      return {
+        success: true,
+        data: {
+          ...c,
+          createdAt: new Date(c.createdAt),
+          updatedAt: new Date(c.updatedAt),
+        },
+      };
+    },
+    [token]
+  );
+
+  const deleteCompany = useCallback(
+    async (id: string): Promise<ServiceResult<null>> => {
+      const response = await fetch(`/companies/${id}`, {
+        method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        return { success: false, error: errorText };
+      }
+      return { success: true, data: null };
+    },
+    [token]
+  );
+
+  return {
+    fetchCompanies,
+    getCompanyById,
+    createCompany,
+    updateCompany,
+    deleteCompany,
+  };
 };
