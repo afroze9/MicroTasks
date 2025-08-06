@@ -1,9 +1,10 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import CompaniesPage from "./pages/CompaniesPage";
 import KeycloakProvider from "./auth/KeycloakProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Keycloak from "keycloak-js";
+import AppLayout from "./AppLayout";
 
 const keycloak = new Keycloak({
   url: "http://localhost:9173",
@@ -32,37 +33,33 @@ keycloak.onAuthError = (error) => {
   console.error("Authentication error", error);
 };
 
-function App() {
+const App = () => {
   return (
     <KeycloakProvider keycloak={keycloak}>
       <BrowserRouter>
-        <nav style={{ marginBottom: "1rem" }}>
-          <Link to="/companies">Companies</Link>
-        </nav>
-        <Routes>
-          <Route path="/" element={<div>Welcome to MicroTasks!</div>} />
-          <Route
-            path="/companies"
-            element={
-              <ProtectedRoute
-                resource="company-api"
-                roles={[
-                  "company_viewer",
-                  "company_manager",
-                  "company_contributor",
-                ]}
-              >
-                <CompaniesPage />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+        <AppLayout>
+          <Routes>
+            <Route path="/" element={<div>Welcome to MicroTasks!</div>} />
+            <Route
+              path="/companies"
+              element={
+                <ProtectedRoute
+                  resource="company-api"
+                  roles={[
+                    "company_viewer",
+                    "company_manager",
+                    "company_contributor",
+                  ]}
+                >
+                  <CompaniesPage />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </AppLayout>
       </BrowserRouter>
     </KeycloakProvider>
   );
-}
+};
 
 export default App;
-{
-  /* <button onClick={() => keycloak.logout()}>Logout</button> */
-}
