@@ -61,7 +61,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", width: "100%" }}>
         <CssBaseline />
         <AppBar
           position="fixed"
@@ -144,9 +144,9 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3,
+            p: 2,
             width: { sm: `calc(100% - ${drawerWidth}px)` },
-            mt: 8,
+            mt: 2,
           }}
         >
           {children}

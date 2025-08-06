@@ -3,19 +3,7 @@ import { useCompanyService } from "../services/companyService";
 import type { Company } from "../services/companyService";
 import { useAuth } from "../auth/useAuth";
 import { Link } from "react-router-dom";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Stack,
-  Typography,
-  Container,
-} from "@mui/material";
+import { DataGrid, type GridRenderCellParams } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -29,6 +17,10 @@ import {
   Chip,
   Box,
   IconButton as MuiIconButton,
+  Container,
+  Stack,
+  Typography,
+  Button,
 } from "@mui/material";
 
 export default function CompaniesPage() {
@@ -136,7 +128,7 @@ export default function CompaniesPage() {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+    <Container sx={{ mb: 4 }}>
       <Stack
         direction="row"
         alignItems="center"
@@ -154,42 +146,62 @@ export default function CompaniesPage() {
         </Button>
       </Stack>
       <Link to="/">Go to Home</Link>
+
       {error && <Typography color="error">{error}</Typography>}
-      <TableContainer component={Paper} sx={{ mt: 2, width: "100%" }}>
-        <Table sx={{ minWidth: 900 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Created At</TableCell>
-              <TableCell>Updated At</TableCell>
-              <TableCell>Tags</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {companies.map((company) => (
-              <TableRow key={company.id}>
-                <TableCell>{company.name}</TableCell>
-                <TableCell>{company.createdAt.toLocaleString()}</TableCell>
-                <TableCell>{company.updatedAt.toLocaleString()}</TableCell>
-                <TableCell>
-                  {company.tags && company.tags.length > 0
-                    ? company.tags.map((tag) => (
-                        <Chip
-                          key={tag.value}
-                          label={tag.value}
-                          size="small"
-                          sx={{ mr: 0.5 }}
-                        />
-                      ))
-                    : "-"}
-                </TableCell>
-                <TableCell align="right">
+
+      <Box sx={{ height: 600, mt: 2 }}>
+        <DataGrid<Company>
+          rows={companies}
+          columns={[
+            { field: "name", headerName: "Name", flex: 1 },
+            {
+              field: "createdAt",
+              headerName: "Created At",
+              flex: 1,
+              renderCell: (params: GridRenderCellParams<Company>) => {
+                const date = params.row.createdAt;
+                return date ? new Date(date).toLocaleString() : "-";
+              },
+            },
+            {
+              field: "updatedAt",
+              headerName: "Updated At",
+              flex: 1,
+              renderCell: (params: GridRenderCellParams<Company>) => {
+                const date = params.row.updatedAt;
+                return date ? new Date(date).toLocaleString() : "-";
+              },
+            },
+            {
+              field: "tags",
+              headerName: "Tags",
+              flex: 1,
+              renderCell: (params: GridRenderCellParams<Company>) =>
+                Array.isArray(params.value) && params.value.length > 0
+                  ? (params.value as Company["tags"]).map((tag) => (
+                      <Chip
+                        key={tag.value}
+                        label={tag.value}
+                        size="small"
+                        sx={{ mr: 0.5 }}
+                      />
+                    ))
+                  : "-",
+            },
+            {
+              field: "actions",
+              headerName: "Actions",
+              flex: 1,
+              sortable: false,
+              filterable: false,
+              align: "right",
+              renderCell: (params: GridRenderCellParams) => (
+                <>
                   <MuiIconButton
                     color="primary"
                     size="small"
                     aria-label="edit"
-                    onClick={() => handleOpenEdit(company)}
+                    onClick={() => handleOpenEdit(params.row)}
                   >
                     <EditIcon />
                   </MuiIconButton>
@@ -198,16 +210,19 @@ export default function CompaniesPage() {
                     size="small"
                     aria-label="delete"
                     sx={{ ml: 1 }}
-                    onClick={() => handleDelete(company.id)}
+                    onClick={() => handleDelete(params.row.id)}
                   >
                     <DeleteIcon />
                   </MuiIconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                </>
+              ),
+            },
+          ]}
+          getRowId={(row) => row.id}
+          disableRowSelectionOnClick
+          pageSizeOptions={[10, 25, 50]}
+        />
+      </Box>
 
       <Dialog
         open={dialogOpen}
