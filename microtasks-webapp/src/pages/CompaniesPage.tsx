@@ -31,7 +31,7 @@ export default function CompaniesPage() {
   const [formName, setFormName] = useState("");
   const [formTags, setFormTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, hasRole, isInRoles } = useAuth();
 
   const { fetchCompanies, createCompany, updateCompany, deleteCompany } =
     useCompanyService();
@@ -136,14 +136,19 @@ export default function CompaniesPage() {
         sx={{ mb: 2 }}
       >
         <Typography variant="h4">Companies</Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleOpenCreate}
-        >
-          Create New Company
-        </Button>
+        {isInRoles("company-api", [
+          "company_manager",
+          "company_contributor",
+        ]) && (
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleOpenCreate}
+          >
+            Create New Company
+          </Button>
+        )}
       </Stack>
       <Link to="/">Go to Home</Link>
 
@@ -197,23 +202,30 @@ export default function CompaniesPage() {
               align: "right",
               renderCell: (params: GridRenderCellParams) => (
                 <>
-                  <MuiIconButton
-                    color="primary"
-                    size="small"
-                    aria-label="edit"
-                    onClick={() => handleOpenEdit(params.row)}
-                  >
-                    <EditIcon />
-                  </MuiIconButton>
-                  <MuiIconButton
-                    color="error"
-                    size="small"
-                    aria-label="delete"
-                    sx={{ ml: 1 }}
-                    onClick={() => handleDelete(params.row.id)}
-                  >
-                    <DeleteIcon />
-                  </MuiIconButton>
+                  {isInRoles("company-api", [
+                    "company_manager",
+                    "company_contributor",
+                  ]) && (
+                    <MuiIconButton
+                      color="primary"
+                      size="small"
+                      aria-label="edit"
+                      onClick={() => handleOpenEdit(params.row)}
+                    >
+                      <EditIcon />
+                    </MuiIconButton>
+                  )}
+                  {hasRole("company-api", "company_manager") && (
+                    <MuiIconButton
+                      color="error"
+                      size="small"
+                      aria-label="delete"
+                      sx={{ ml: 1 }}
+                      onClick={() => handleDelete(params.row.id)}
+                    >
+                      <DeleteIcon />
+                    </MuiIconButton>
+                  )}
                 </>
               ),
             },
