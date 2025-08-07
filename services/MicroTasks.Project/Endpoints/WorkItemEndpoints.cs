@@ -11,11 +11,16 @@ public static class WorkItemEndpoints
     {
         var group = app.MapGroup("/workitems");
 
-        group.MapGet("/", GetAllWorkItemsAsync);
-        group.MapGet("/{id}", GetWorkItemByIdAsync);
-        group.MapPost("/", CreateWorkItemAsync);
-        group.MapPut("/{id}", UpdateWorkItemAsync);
-        group.MapDelete("/{id}", DeleteWorkItemAsync);
+        group.MapGet("/", GetAllWorkItemsAsync)
+            .RequireAuthorization("WorkItemRead");
+        group.MapGet("/{id}", GetWorkItemByIdAsync)
+            .RequireAuthorization("WorkItemRead");
+        group.MapPost("/", CreateWorkItemAsync)
+            .RequireAuthorization("WorkItemWrite");
+        group.MapPut("/{id}", UpdateWorkItemAsync)
+            .RequireAuthorization("WorkItemWrite");
+        group.MapDelete("/{id}", DeleteWorkItemAsync)
+            .RequireAuthorization("WorkItemDelete");
     }
 
     private static async Task<IResult> GetAllWorkItemsAsync(ProjectDbContext db)

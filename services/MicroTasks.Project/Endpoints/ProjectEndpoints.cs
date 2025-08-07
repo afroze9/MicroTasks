@@ -14,11 +14,16 @@ public static class ProjectEndpoints
     {
         var group = app.MapGroup("/projects");
 
-        group.MapGet("/", GetAllProjectsAsync);
-        group.MapGet("/{id}", GetProjectByIdAsync);
-        group.MapPost("/", CreateProjectAsync);
-        group.MapPut("/{id}", UpdateProjectAsync);
-        group.MapDelete("/{id}", DeleteProjectAsync);
+        group.MapGet("/", GetAllProjectsAsync)
+            .RequireAuthorization("ProjectRead");
+        group.MapGet("/{id}", GetProjectByIdAsync)
+            .RequireAuthorization("ProjectRead");
+        group.MapPost("/", CreateProjectAsync)
+            .RequireAuthorization("ProjectWrite");
+        group.MapPut("/{id}", UpdateProjectAsync)
+            .RequireAuthorization("ProjectWrite");
+        group.MapDelete("/{id}", DeleteProjectAsync)
+            .RequireAuthorization("ProjectDelete");
     }
 
     private static async Task<IResult> GetAllProjectsAsync(ProjectDbContext db)
