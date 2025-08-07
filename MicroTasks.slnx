@@ -6,6 +6,7 @@
   </Configurations>
   <Folder Name="/services/">
     <Project Path="services/MicroTasks.Company/MicroTasks.Company.csproj" />
+    <Project Path="services/MicroTasks.Project/MicroTasks.Project.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/MicroTasks.Company.Tests/MicroTasks.Company.Tests.csproj" />

@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\services\MicroTasks.Company\MicroTasks.Company.csproj" />
+    <ProjectReference Include="..\services\MicroTasks.Project\MicroTasks.Project.csproj" />
   </ItemGroup>
 
   <Target Name="RestoreNpm" BeforeTargets="Build" Condition=" '$(DesignTimeBuild)' != 'true' ">
