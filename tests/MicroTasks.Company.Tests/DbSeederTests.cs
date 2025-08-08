@@ -9,16 +9,16 @@ public class DbSeederTests
     [Fact]
     public void Seed_AddsDefaultCompanies()
     {
-        var options = new DbContextOptionsBuilder<CompanyDbContext>()
+        DbContextOptions<CompanyDbContext> options = new DbContextOptionsBuilder<CompanyDbContext>()
             .UseInMemoryDatabase(databaseName: "TestDbSeeder")
             .Options;
-        using var db = new CompanyDbContext(options);
+        using CompanyDbContext db = new CompanyDbContext(options);
 
         // Act
         DbSeeder.Seed(db);
 
         // Assert
-        var companies = db.Companies.Include(c => c.Tags).ToList();
+        System.Collections.Generic.List<CompanyApi.Models.Company> companies = db.Companies.Include(c => c.Tags).ToList();
         Assert.True(companies.Count >= 2);
         Assert.Contains(companies, c => c.Name == "Acme Corp");
         Assert.Contains(companies, c => c.Name == "Beta Solutions");

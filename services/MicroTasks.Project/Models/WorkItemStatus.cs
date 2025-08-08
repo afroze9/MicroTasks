@@ -18,7 +18,7 @@ public static class WorkItemStatusExtensions
 
     public static WorkItemStatus FromWorkItemStatusString(string value)
     {
-        if (Enum.TryParse<WorkItemStatus>(value, true, out var result))
+        if (Enum.TryParse<WorkItemStatus>(value, true, out WorkItemStatus result))
             return result;
         throw new ArgumentException($"Invalid WorkItemStatus value: {value}");
     }

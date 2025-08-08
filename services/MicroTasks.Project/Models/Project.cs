@@ -24,7 +24,7 @@ public class Project : BaseEntity
         Id = Guid.NewGuid();
         Name = name;
         Description = description;
-        foreach (var wi in workItems)
+        foreach (WorkItem wi in workItems)
         {
             AddWorkItem(wi);
         }
@@ -42,7 +42,7 @@ public class Project : BaseEntity
 
     public void AddWorkItems(IEnumerable<WorkItem> workItems)
     {
-        foreach (var wi in workItems)
+        foreach (WorkItem wi in workItems)
         {
             AddWorkItem(wi);
         }

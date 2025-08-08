@@ -7,7 +7,7 @@ public class CompanyDtoTests
     [Fact]
     public void CompanyDto_Defaults_AreValid()
     {
-        var dto = new CompanyDto();
+        CompanyDto dto = new CompanyDto();
         Assert.Equal(string.Empty, dto.Name);
         Assert.NotNull(dto.Tags);
         Assert.Empty(dto.Tags);
@@ -16,7 +16,7 @@ public class CompanyDtoTests
     [Fact]
     public void CompanyDto_CanAssignTags()
     {
-        var dto = new CompanyDto
+        CompanyDto dto = new CompanyDto
         {
             Name = "TestCo",
             Tags = new() { new TagDto { Value = "enterprise" }, new TagDto { Value = "technology" } }

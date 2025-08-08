@@ -9,7 +9,7 @@ public static class WorkItemEndpoints
 {
     public static void MapWorkItemEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/api/workitems");
+        RouteGroupBuilder group = app.MapGroup("/api/workitems");
 
         group.MapGet("/", GetAllWorkItemsAsync)
             .RequireAuthorization("WorkItemRead");
@@ -22,7 +22,7 @@ public static class WorkItemEndpoints
         group.MapDelete("/{id}", DeleteWorkItemAsync)
             .RequireAuthorization("WorkItemDelete");
 
-        var projectsGroup = app.MapGroup("/api/projects");
+        RouteGroupBuilder projectsGroup = app.MapGroup("/api/projects");
         projectsGroup.MapGet("/{projectId}/workitems", GetWorkItemsByProjectIdAsync)
             .RequireAuthorization("WorkItemRead")
             .WithName("GetProjectWorkItems")
@@ -31,23 +31,23 @@ public static class WorkItemEndpoints
 
     private static async Task<IResult> GetAllWorkItemsAsync(ProjectDbContext db)
     {
-        var workItems = await db.WorkItems.ToListAsync();
-        var result = workItems.Select(WorkItemDtoExtensions.FromEntity);
+        List<WorkItem> workItems = await db.WorkItems.ToListAsync();
+        IEnumerable<WorkItemDto> result = workItems.Select(WorkItemDtoExtensions.FromEntity);
         return Results.Ok(result);
     }
 
     private static async Task<IResult> GetWorkItemsByProjectIdAsync(Guid projectId, ProjectDbContext db)
     {
-        var workItems = await db.WorkItems
+        List<WorkItem> workItems = await db.WorkItems
             .Where(wi => wi.ProjectId == projectId)
             .ToListAsync();
-        var result = workItems.Select(WorkItemDtoExtensions.FromEntity);
+        IEnumerable<WorkItemDto> result = workItems.Select(WorkItemDtoExtensions.FromEntity);
         return Results.Ok(result);
     }
 
     private static async Task<IResult> GetWorkItemByIdAsync(Guid id, ProjectDbContext db)
     {
-        var wi = await db.WorkItems.FindAsync(id);
+        WorkItem? wi = await db.WorkItems.FindAsync(id);
         if (wi == null)
             return Results.NotFound();
         return Results.Ok(wi.FromEntity());
@@ -55,7 +55,7 @@ public static class WorkItemEndpoints
 
     private static async Task<IResult> CreateWorkItemAsync(WorkItemDto dto, ProjectDbContext db)
     {
-        var workItem = new WorkItem(dto.ProjectId, dto.Title, dto.Description);
+        WorkItem workItem = new WorkItem(dto.ProjectId, dto.Title, dto.Description);
         workItem.ChangeStatus(WorkItemStatusExtensions.FromWorkItemStatusString(dto.Status));
         await db.WorkItems.AddAsync(workItem);
         await db.SaveChangesAsync();
@@ -64,7 +64,7 @@ public static class WorkItemEndpoints
 
     private static async Task<IResult> UpdateWorkItemAsync(Guid id, WorkItemDto dto, ProjectDbContext db)
     {
-        var workItem = await db.WorkItems.FindAsync(id);
+        WorkItem? workItem = await db.WorkItems.FindAsync(id);
         if (workItem == null)
             return Results.NotFound();
         workItem.ChangeTitle(dto.Title);
@@ -77,7 +77,7 @@ public static class WorkItemEndpoints
 
     private static async Task<IResult> DeleteWorkItemAsync(Guid id, ProjectDbContext db)
     {
-        var workItem = await db.WorkItems.FindAsync(id);
+        WorkItem? workItem = await db.WorkItems.FindAsync(id);
         if (workItem == null)
             return Results.NotFound();
         db.WorkItems.Remove(workItem);

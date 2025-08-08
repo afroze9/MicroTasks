@@ -8,9 +8,9 @@ public class TagModelTests
     [Fact]
     public void Tag_CanBeConstructedAndAssigned()
     {
-        var tag = new Tag { Value = "demo" };
+        Tag tag = new Tag { Value = "demo" };
         Assert.Equal("demo", tag.Value);
-        var tag2 = new Tag("test");
+        Tag tag2 = new Tag("test");
         Assert.Equal("test", tag2.Value);
     }
 
@@ -24,7 +24,7 @@ public class TagModelTests
     [Fact]
     public void Tag_Id_CanBeAssigned()
     {
-        var tag = new Tag("demo") { Id = Guid.NewGuid() };
+        Tag tag = new Tag("demo") { Id = Guid.NewGuid() };
         Assert.NotEqual(Guid.Empty, tag.Id);
     }
 }

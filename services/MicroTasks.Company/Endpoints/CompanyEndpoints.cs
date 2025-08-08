@@ -2,6 +2,8 @@ using MicroTasks.CompanyApi.Data;
 using Microsoft.EntityFrameworkCore;
 using MicroTasks.CompanyApi.Models;
 using MicroTasks.CompanyApi.Dtos;
+using MassTransit;
+using MicroTasks.Events.CompanyApi;
 
 namespace MicroTasks.CompanyApi.Endpoints;
 
@@ -34,7 +36,10 @@ public static class CompanyEndpoints
         return company is not null ? Results.Ok(company) : Results.NotFound();
     }
 
-    private static async Task<IResult> CreateCompany(CompanyDbContext db, CompanyDto dto)
+    private static async Task<IResult> CreateCompany(
+        CompanyDbContext db,
+        ITopicProducer<CompanyCreatedEvent> producer,
+        CompanyDto dto)
     {
         List<Tag> tags = new List<Tag>();
         if (dto.Tags != null && dto.Tags.Count != 0)
@@ -53,10 +58,15 @@ public static class CompanyEndpoints
         Company company = new Company(dto.Name, tags);
         db.Companies.Add(company);
         await db.SaveChangesAsync();
+        await producer.Produce(new CompanyCreatedEvent { CompanyId = company.Id });
         return Results.Created($"/companies/{company.Id}", company);
     }
 
-    private static async Task<IResult> UpdateCompany(CompanyDbContext db, Guid id, CompanyDto dto)
+    private static async Task<IResult> UpdateCompany(
+        CompanyDbContext db,
+        ITopicProducer<CompanyUpdatedEvent> producer,
+        Guid id,
+        CompanyDto dto)
     {
         Company? existing = await db.Companies.Include(c => c.Tags).FirstOrDefaultAsync(c => c.Id == id);
         if (existing is null) return Results.NotFound();
@@ -79,16 +89,21 @@ public static class CompanyEndpoints
         existing.ClearTags();
         existing.AddTags(tags);
         await db.SaveChangesAsync();
+        await producer.Produce(new CompanyUpdatedEvent { CompanyId = id });
         return Results.Ok(existing);
     }
 
-    private static async Task<IResult> DeleteCompany(CompanyDbContext db, Guid id)
+    private static async Task<IResult> DeleteCompany(
+        CompanyDbContext db,
+        ITopicProducer<CompanyDeletedEvent> producer,
+        Guid id)
     {
         Company? company = await db.Companies.Include(c => c.Tags).FirstOrDefaultAsync(c => c.Id == id);
         if (company is null) return Results.NotFound();
         company.ClearTags(); // Remove links to tags
         db.Companies.Remove(company);
         await db.SaveChangesAsync();
+        await producer.Produce(new CompanyDeletedEvent { CompanyId = id });
         return Results.NoContent();
     }
 }

@@ -31,9 +31,9 @@ public class AuditEntitySaveChangesInterceptor : SaveChangesInterceptor
     private void UpdateAuditFields(DbContext? context)
     {
         if (context == null) return;
-        var userId = _currentUserService.GetCurrentUserId();
-        var now = _currentDateTimeService.UtcNow;
-        foreach (var entry in context.ChangeTracker.Entries<BaseEntity>())
+        string? userId = _currentUserService.GetCurrentUserId();
+        DateTime now = _currentDateTimeService.UtcNow;
+        foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BaseEntity> entry in context.ChangeTracker.Entries<BaseEntity>())
         {
             if (entry.State == EntityState.Added)
             {

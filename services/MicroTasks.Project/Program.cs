@@ -5,7 +5,7 @@ using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 using MicroTasks.ProjectApi.Auth;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.AddServiceDefaults();
 
@@ -17,7 +17,7 @@ builder.Services.AddScoped<AuditEntitySaveChangesInterceptor>();
 builder.Services.AddDbContext<ProjectDbContext>((sp, options) =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("projectdb"));
-    var interceptor = sp.GetRequiredService<AuditEntitySaveChangesInterceptor>();
+    AuditEntitySaveChangesInterceptor interceptor = sp.GetRequiredService<AuditEntitySaveChangesInterceptor>();
     options.AddInterceptors(interceptor);
 });
 
@@ -56,7 +56,7 @@ else
     }).AddKeycloakAuthorization(builder.Configuration);
 }
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -67,9 +67,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapDefaultEndpoints();
 
-using (var scope = app.Services.CreateScope())
+using (IServiceScope scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ProjectDbContext>();
+    ProjectDbContext db = scope.ServiceProvider.GetRequiredService<ProjectDbContext>();
     DbSeeder.Seed(db);
 }
 

@@ -7,7 +7,7 @@ public class TagDtoTests
     [Fact]
     public void TagDto_CanBeConstructedAndAssigned()
     {
-        var tag = new TagDto { Value = "demo" };
+        TagDto tag = new TagDto { Value = "demo" };
         Assert.Equal("demo", tag.Value);
     }
 }

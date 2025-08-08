@@ -14,4 +14,5 @@
   <Project Path="MicroTasks.AppHost/MicroTasks.AppHost.csproj" />
   <Project Path="MicroTasks.Core/MicroTasks.Core.csproj" />
   <Project Path="MicroTasks.ServiceDefaults/MicroTasks.ServiceDefaults.csproj" />
+  <Project Path="MicroTasks.Events/MicroTasks.Events.csproj" />
 </Solution>

@@ -18,7 +18,7 @@ public static class ProjectStatusExtensions
 
     public static ProjectStatus FromProjectStatusString(this string value)
     {
-        if (Enum.TryParse<ProjectStatus>(value, true, out var result))
+        if (Enum.TryParse<ProjectStatus>(value, true, out ProjectStatus result))
             return result;
         throw new ArgumentException($"Invalid ProjectStatus value: {value}");
     }

@@ -5,12 +5,17 @@ IResourceBuilder<KeycloakResource> keycloak = builder
     .WithDataBindMount(@"I:\Keycloak\Data")
     .WithLifetime(ContainerLifetime.Persistent);
 
+IResourceBuilder<KafkaServerResource> kafka = builder
+    .AddKafka("kafka", 9092)
+    .WithKafkaUI();
+
 IResourceBuilder<PostgresServerResource> companyDb = builder
     .AddPostgres("companydb")
     .WithLifetime(ContainerLifetime.Persistent);
 
 IResourceBuilder<ProjectResource> companyApi = builder
     .AddProject<Projects.MicroTasks_Company>("company")
+    .WithReference(kafka)
     .WaitFor(companyDb)
     .WithReference(companyDb);
 
@@ -20,6 +25,7 @@ IResourceBuilder<PostgresServerResource> projectDb = builder
 
 IResourceBuilder<ProjectResource> projectApi = builder
     .AddProject<Projects.MicroTasks_Project>("project")
+    .WithReference(kafka)
     .WaitFor(projectDb)
     .WithReference(projectDb);
 

@@ -7,8 +7,8 @@ public class CompanyModelTests
     [Fact]
     public void Company_CanBeConstructedWithTags()
     {
-        var tags = new[] { new Tag { Value = "enterprise" }, new Tag { Value = "technology" } };
-        var company = new Company("Acme Corp", tags);
+        Tag[] tags = new[] { new Tag { Value = "enterprise" }, new Tag { Value = "technology" } };
+        Company company = new Company("Acme Corp", tags);
         Assert.Equal("Acme Corp", company.Name);
         Assert.Equal(2, company.Tags.Count);
         Assert.Contains(company.Tags, t => t.Value == "enterprise");
@@ -19,7 +19,7 @@ public class CompanyModelTests
     [Fact]
     public void Company_AddTag_AddsUniqueTag()
     {
-        var company = new Company("TestCo");
+        Company company = new Company("TestCo");
         company.AddTag(new Tag { Value = "demo" });
         company.AddTag(new Tag { Value = "demo" }); // duplicate
         Assert.Single(company.Tags);
@@ -28,7 +28,7 @@ public class CompanyModelTests
     [Fact]
     public void Company_AddTag_NullTag_DoesNothing()
     {
-        var company = new Company("TestCo");
+        Company company = new Company("TestCo");
         company.AddTag(null);
         Assert.Empty(company.Tags);
     }
@@ -36,8 +36,8 @@ public class CompanyModelTests
     [Fact]
     public void Company_AddTags_AddsMultipleTags()
     {
-        var company = new Company("TestCo");
-        var tags = new[] { new Tag { Value = "one" }, new Tag { Value = "two" } };
+        Company company = new Company("TestCo");
+        Tag[] tags = new[] { new Tag { Value = "one" }, new Tag { Value = "two" } };
         company.AddTags(tags);
         Assert.Equal(2, company.Tags.Count);
         Assert.Contains(company.Tags, t => t.Value == "one");
@@ -47,8 +47,8 @@ public class CompanyModelTests
     [Fact]
     public void Company_AddTags_IgnoresDuplicatesAndNulls()
     {
-        var company = new Company("TestCo");
-        var tags = new Tag?[] { new Tag { Value = "one" }, new Tag { Value = "one" }, null };
+        Company company = new Company("TestCo");
+        Tag[] tags = new Tag?[] { new Tag { Value = "one" }, new Tag { Value = "one" }, null };
         company.AddTags(tags!);
         Assert.Single(company.Tags);
         Assert.Contains(company.Tags, t => t.Value == "one");
@@ -57,7 +57,7 @@ public class CompanyModelTests
     [Fact]
     public void Company_RemoveTag_RemovesTag()
     {
-        var company = new Company("TestCo", new[] { new Tag { Value = "demo" } });
+        Company company = new Company("TestCo", new[] { new Tag { Value = "demo" } });
         company.RemoveTag("demo");
         Assert.Empty(company.Tags);
     }
@@ -65,7 +65,7 @@ public class CompanyModelTests
     [Fact]
     public void Company_ChangeName_UpdatesName()
     {
-        var company = new Company("OldName");
+        Company company = new Company("OldName");
         company.ChangeName("NewName");
         Assert.Equal("NewName", company.Name);
     }
@@ -73,7 +73,7 @@ public class CompanyModelTests
     [Fact]
     public void Company_Deactivate_And_Activate()
     {
-        var company = new Company("TestCo");
+        Company company = new Company("TestCo");
         company.Deactivate();
         Assert.False(company.IsActive);
         company.Activate();

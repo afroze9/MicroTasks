@@ -11,7 +11,7 @@ public static class DbSeeder
         // Seed Projects
         if (!db.Projects.Any())
         {
-            var workItems1 = new List<WorkItem>
+            List<WorkItem> workItems1 = new List<WorkItem>
             {
                 new WorkItem(Guid.NewGuid(), "Setup project repo", "Initialize repository and CI/CD")
                 {
@@ -24,7 +24,7 @@ public static class DbSeeder
                     UpdatedBy = "seeder"
                 }
             };
-            var workItems2 = new List<WorkItem>
+            List<WorkItem> workItems2 = new List<WorkItem>
             {
                 new WorkItem(Guid.NewGuid(), "Create login page", "Implement authentication UI")
                 {

@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 using MicroTasks.CompanyApi.Auth;
+using MassTransit;
+using MicroTasks.Events.CompanyApi;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -18,7 +20,7 @@ builder.Services.AddScoped<AuditEntitySaveChangesInterceptor>();
 builder.Services.AddDbContext<CompanyDbContext>((sp, options) =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("companydb"));
-    var interceptor = sp.GetRequiredService<AuditEntitySaveChangesInterceptor>();
+    AuditEntitySaveChangesInterceptor interceptor = sp.GetRequiredService<AuditEntitySaveChangesInterceptor>();
     options.AddInterceptors(interceptor);
 });
 
@@ -51,6 +53,20 @@ else
     }).AddKeycloakAuthorization(builder.Configuration);
 }
 
+builder.Services.AddMassTransit(options =>
+{
+    options.UsingInMemory();
+    options.AddRider(rider =>
+    {
+        rider.AddProducer<CompanyCreatedEvent>(nameof(CompanyCreatedEvent));
+        rider.AddProducer<CompanyUpdatedEvent>(nameof(CompanyUpdatedEvent));
+        rider.AddProducer<CompanyDeletedEvent>(nameof(CompanyDeletedEvent));
+        rider.UsingKafka((context, k) =>
+        {
+            k.Host(builder.Configuration.GetConnectionString("kafka"));
+        });
+    });
+});
 
 WebApplication app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -67,8 +83,10 @@ using (IServiceScope scope = app.Services.CreateScope())
 {
     CompanyDbContext db = scope.ServiceProvider.GetRequiredService<CompanyDbContext>();
     DbSeeder.Seed(db);
+
+    IBusControl busControl = scope.ServiceProvider.GetRequiredService<IBusControl>();
+    await busControl.StartAsync(new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
 }
 
 app.MapCompanyEndpoints();
-
 app.Run();

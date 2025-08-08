@@ -12,7 +12,7 @@ public static class ProjectEndpoints
 
     public static void MapProjectEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/api/projects");
+        RouteGroupBuilder group = app.MapGroup("/api/projects");
 
         group.MapGet("/", GetAllProjectsAsync)
             .RequireAuthorization("ProjectRead");
@@ -28,14 +28,14 @@ public static class ProjectEndpoints
 
     private static async Task<IResult> GetAllProjectsAsync(ProjectDbContext db)
     {
-        var projects = await db.Projects.ToListAsync();
-        var result = projects.Select(p => p.FromEntity());
+        List<Project> projects = await db.Projects.ToListAsync();
+        IEnumerable<ProjectDto> result = projects.Select(p => p.FromEntity());
         return Results.Ok(result);
     }
 
     private static async Task<IResult> GetProjectByIdAsync(Guid id, ProjectDbContext db)
     {
-        var p = await db.Projects.FindAsync(id);
+        Project? p = await db.Projects.FindAsync(id);
         if (p == null)
             return Results.NotFound();
         return Results.Ok(p.FromEntity());
@@ -43,7 +43,7 @@ public static class ProjectEndpoints
 
     private static async Task<IResult> CreateProjectAsync(ProjectDto dto, ProjectDbContext db)
     {
-        var project = new Project(dto.Name, dto.Description, []);
+        Project project = new Project(dto.Name, dto.Description, []);
         project.ChangeStatus(dto.Status.FromProjectStatusString());
         await db.Projects.AddAsync(project);
         await db.SaveChangesAsync();
@@ -52,7 +52,7 @@ public static class ProjectEndpoints
 
     private static async Task<IResult> UpdateProjectAsync(Guid id, ProjectDto dto, ProjectDbContext db)
     {
-        var project = await db.Projects.FindAsync(id);
+        Project? project = await db.Projects.FindAsync(id);
         if (project == null)
             return Results.NotFound();
         project.ChangeName(dto.Name);
@@ -65,7 +65,7 @@ public static class ProjectEndpoints
 
     private static async Task<IResult> DeleteProjectAsync(Guid id, ProjectDbContext db)
     {
-        var project = await db.Projects.FindAsync(id);
+        Project? project = await db.Projects.FindAsync(id);
         if (project == null)
             return Results.NotFound();
         db.Projects.Remove(project);

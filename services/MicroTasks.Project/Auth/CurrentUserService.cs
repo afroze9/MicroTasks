@@ -18,7 +18,7 @@ public class CurrentUserService : ICurrentUserService
 
     public string? GetCurrentUserId()
     {
-        var user = _httpContextAccessor.HttpContext?.User;
+        ClaimsPrincipal? user = _httpContextAccessor.HttpContext?.User;
         return user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
     }
 }
