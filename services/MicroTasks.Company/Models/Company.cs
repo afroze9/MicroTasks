@@ -1,21 +1,25 @@
+using MicroTasks.Core;
 namespace MicroTasks.CompanyApi.Models;
 
 // Aggregate Root for Company
-public class Company
+public class Company : BaseEntity
 {
-    public Guid Id { get; private set; }
     public string Name { get; private set; }
     private readonly List<Tag> _tags = new();
     public IReadOnlyCollection<Tag> Tags => _tags.AsReadOnly();
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
     public bool IsActive { get; private set; }
+    public int ProjectCount { get; private set; }
+
+    // DDD: Business logic to increment/decrement project count
+    public void SetProjectCount(int count)
+    {
+        ProjectCount = count;
+    }
 
     // DDD: Constructor for new Company
     private Company() { }
     public Company(string name, IEnumerable<Tag>? tags = null)
     {
-        Id = Guid.NewGuid();
         Name = name;
         if (tags != null)
         {
@@ -24,8 +28,6 @@ public class Company
                 AddTag(tag);
             }
         }
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = CreatedAt;
         IsActive = true;
     }
 

@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\MicroTasks.ServiceDefaults\MicroTasks.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\MicroTasks.Core\MicroTasks.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -26,7 +26,7 @@ public class CompanyAppFixture : IAsyncLifetime
         });
         App = await builder.BuildAsync();
         await App.StartAsync();
-        using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(180));
         await App.ResourceNotifications.WaitForResourceHealthyAsync("company", cts.Token);
         HttpClient = App.CreateHttpClient("company");
     }

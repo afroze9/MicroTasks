@@ -12,5 +12,6 @@
     <Project Path="tests/MicroTasks.Company.Tests/MicroTasks.Company.Tests.csproj" />
   </Folder>
   <Project Path="MicroTasks.AppHost/MicroTasks.AppHost.csproj" />
+  <Project Path="MicroTasks.Core/MicroTasks.Core.csproj" />
   <Project Path="MicroTasks.ServiceDefaults/MicroTasks.ServiceDefaults.csproj" />
 </Solution>

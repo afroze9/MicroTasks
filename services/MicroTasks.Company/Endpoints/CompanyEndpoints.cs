@@ -50,11 +50,7 @@ public static class CompanyEndpoints
             tags.AddRange(existingTags);
             tags.AddRange(newTags);
         }
-        Company company = new Company(dto.Name, tags)
-        {
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+        Company company = new Company(dto.Name, tags);
         db.Companies.Add(company);
         await db.SaveChangesAsync();
         return Results.Created($"/companies/{company.Id}", company);
@@ -65,6 +61,7 @@ public static class CompanyEndpoints
         Company? existing = await db.Companies.Include(c => c.Tags).FirstOrDefaultAsync(c => c.Id == id);
         if (existing is null) return Results.NotFound();
         existing.ChangeName(dto.Name);
+        existing.SetProjectCount(dto.ProjectCount);
         List<Tag> tags = new List<Tag>();
         if (dto.Tags != null && dto.Tags.Count != 0)
         {
@@ -81,7 +78,6 @@ public static class CompanyEndpoints
         }
         existing.ClearTags();
         existing.AddTags(tags);
-        existing.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
         return Results.Ok(existing);
     }

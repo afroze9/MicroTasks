@@ -8,8 +8,19 @@ using MicroTasks.CompanyApi.Auth;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.AddServiceDefaults();
-builder.Services.AddDbContext<CompanyDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("companydb")));
+
+// Register common services
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddSingleton<ICurrentDateTimeService, CurrentDateTimeService>();
+builder.Services.AddScoped<AuditEntitySaveChangesInterceptor>();
+
+builder.Services.AddDbContext<CompanyDbContext>((sp, options) =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("companydb"));
+    var interceptor = sp.GetRequiredService<AuditEntitySaveChangesInterceptor>();
+    options.AddInterceptors(interceptor);
+});
 
 if (Environment.GetEnvironmentVariable("ASPIRE_TEST_AUTH") == "1")
 {

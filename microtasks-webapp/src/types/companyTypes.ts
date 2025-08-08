@@ -9,6 +9,7 @@ export type Company = {
   tags: Tag[];
   createdAt: Date;
   updatedAt: Date;
+  projectCount: number;
 };
 
 export type TagDto = {
@@ -18,4 +19,5 @@ export type TagDto = {
 export type CompanyDto = {
   name: string;
   tags?: TagDto[];
+  projectCount?: number;
 };
