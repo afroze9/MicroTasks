@@ -9,6 +9,7 @@ public static class ProjectDtoExtensions
         return new ProjectDto
         {
             Id = project.Id,
+            CompanyId = project.CompanyId,
             Name = project.Name,
             Description = project.Description,
             CreatedAt = project.CreatedAt,

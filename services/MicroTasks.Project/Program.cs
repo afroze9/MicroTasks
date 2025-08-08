@@ -3,7 +3,10 @@ using MicroTasks.ProjectApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
+
 using MicroTasks.ProjectApi.Auth;
+using MassTransit;
+using MicroTasks.Events;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -55,6 +58,22 @@ else
             policy.RequireResourceRoles("workitem_manager"));
     }).AddKeycloakAuthorization(builder.Configuration);
 }
+
+
+builder.Services.AddMassTransit(options =>
+{
+    options.UsingInMemory();
+    options.AddRider(rider =>
+    {
+        rider.AddProducer<ProjectCreatedEvent>(nameof(ProjectCreatedEvent));
+        rider.AddProducer<ProjectUpdatedEvent>(nameof(ProjectUpdatedEvent));
+        rider.AddProducer<ProjectDeletedEvent>(nameof(ProjectDeletedEvent));
+        rider.UsingKafka((context, k) =>
+        {
+            k.Host(builder.Configuration.GetConnectionString("kafka"));
+        });
+    });
+});
 
 WebApplication app = builder.Build();
 if (app.Environment.IsDevelopment())

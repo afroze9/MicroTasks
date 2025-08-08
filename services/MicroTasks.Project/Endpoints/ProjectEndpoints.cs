@@ -3,6 +3,8 @@ using MicroTasks.ProjectApi.Models;
 using MicroTasks.ProjectApi.Dtos;
 using MicroTasks.ProjectApi.Data;
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
+using MicroTasks.Events;
 
 namespace MicroTasks.ProjectApi.Endpoints;
 
@@ -41,16 +43,24 @@ public static class ProjectEndpoints
         return Results.Ok(p.FromEntity());
     }
 
-    private static async Task<IResult> CreateProjectAsync(ProjectDto dto, ProjectDbContext db)
+    private static async Task<IResult> CreateProjectAsync(ProjectDto dto, ProjectDbContext db, ITopicProducer<ProjectCreatedEvent> projectCreatedProducer)
     {
-        Project project = new Project(dto.Name, dto.Description, []);
+        Project project = new Project(dto.CompanyId, dto.Name, dto.Description, []);
         project.ChangeStatus(dto.Status.FromProjectStatusString());
         await db.Projects.AddAsync(project);
         await db.SaveChangesAsync();
+
+        var evt = new ProjectCreatedEvent
+        {
+            ProjectId = project.Id,
+            CompanyId = project.CompanyId
+        };
+        await projectCreatedProducer.Produce(evt);
+
         return Results.Created($"/projects/{project.Id}", ProjectDtoExtensions.FromEntity(project));
     }
 
-    private static async Task<IResult> UpdateProjectAsync(Guid id, ProjectDto dto, ProjectDbContext db)
+    private static async Task<IResult> UpdateProjectAsync(Guid id, ProjectDto dto, ProjectDbContext db, ITopicProducer<ProjectUpdatedEvent> projectUpdatedProducer)
     {
         Project? project = await db.Projects.FindAsync(id);
         if (project == null)
@@ -60,16 +70,32 @@ public static class ProjectEndpoints
         project.ChangeStatus(dto.Status.FromProjectStatusString());
         db.Projects.Update(project);
         await db.SaveChangesAsync();
+
+        var evt = new ProjectUpdatedEvent
+        {
+            ProjectId = project.Id,
+            CompanyId = project.CompanyId
+        };
+        await projectUpdatedProducer.Produce(evt);
+
         return Results.Ok(ProjectDtoExtensions.FromEntity(project));
     }
 
-    private static async Task<IResult> DeleteProjectAsync(Guid id, ProjectDbContext db)
+    private static async Task<IResult> DeleteProjectAsync(Guid id, ProjectDbContext db, ITopicProducer<ProjectDeletedEvent> projectDeletedProducer)
     {
         Project? project = await db.Projects.FindAsync(id);
         if (project == null)
             return Results.NotFound();
         db.Projects.Remove(project);
         await db.SaveChangesAsync();
+
+        var evt = new ProjectDeletedEvent
+        {
+            ProjectId = project.Id,
+            CompanyId = project.CompanyId
+        };
+        await projectDeletedProducer.Produce(evt);
+
         return Results.NoContent();
     }
 }

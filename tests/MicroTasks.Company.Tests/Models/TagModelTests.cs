@@ -24,7 +24,7 @@ public class TagModelTests
     [Fact]
     public void Tag_Id_CanBeAssigned()
     {
-        Tag tag = new Tag("demo") { Id = Guid.NewGuid() };
+        Tag tag = new Tag("demo");
         Assert.NotEqual(Guid.Empty, tag.Id);
     }
 }

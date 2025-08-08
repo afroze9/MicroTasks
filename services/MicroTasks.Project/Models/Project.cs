@@ -6,6 +6,7 @@ namespace MicroTasks.ProjectApi.Models;
 public class Project : BaseEntity
 {
     // Id is inherited from BaseEntity
+    public Guid CompanyId { get; private set; }
     public string Name { get; private set; }
     public string Description { get; private set; } = string.Empty;
     private readonly List<WorkItem> _workItems = new();
@@ -19,9 +20,10 @@ public class Project : BaseEntity
     }
 
     // DDD: Public constructor for new Project
-    public Project(string name, string description, IEnumerable<WorkItem> workItems)
+    public Project(Guid companyId, string name, string description, IEnumerable<WorkItem> workItems)
     {
         Id = Guid.NewGuid();
+        CompanyId = companyId;
         Name = name;
         Description = description;
         foreach (WorkItem wi in workItems)

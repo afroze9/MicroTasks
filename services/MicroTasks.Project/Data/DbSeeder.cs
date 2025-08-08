@@ -37,8 +37,10 @@ public static class DbSeeder
                     UpdatedBy = "seeder"
                 }
             };
+
             db.Projects.AddRange(
                 new Project(
+                    companyId: Guid.NewGuid(),
                     name: "MicroTasks Platform",
                     description: "Platform for managing micro tasks",
                     workItems: workItems1
@@ -48,6 +50,7 @@ public static class DbSeeder
                     UpdatedBy = "seeder"
                 },
                 new Project(
+                    companyId: Guid.NewGuid(),
                     name: "Client Portal",
                     description: "Portal for client interactions",
                     workItems: workItems2
