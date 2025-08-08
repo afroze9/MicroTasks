@@ -19,7 +19,12 @@ public static class DbSeeder
                         new Tag { Value = "technology" }
                     }
                 )
-                { CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                {
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    CreatedBy = "seeder",
+                    UpdatedBy = "seeder"
+                },
                 new Company(
                     name: "Beta Solutions",
                     tags: new[] {
@@ -27,7 +32,12 @@ public static class DbSeeder
                         new Tag { Value = "consulting" }
                     }
                 )
-                { CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                {
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    CreatedBy = "seeder",
+                    UpdatedBy = "seeder"
+                }
             );
             db.SaveChanges();
         }

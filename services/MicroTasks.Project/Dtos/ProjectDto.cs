@@ -7,5 +7,7 @@ public class ProjectDto
     public string Description { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public string? CreatedBy { get; set; }
+    public string? UpdatedBy { get; set; }
     public string Status { get; set; } = string.Empty;
 }

@@ -1,20 +1,22 @@
 using System.Collections.Generic;
+using MicroTasks.Core;
 
 namespace MicroTasks.ProjectApi.Models;
 
-public class Project
+public class Project : BaseEntity
 {
-    public Guid Id { get; private set; }
+    // Id is inherited from BaseEntity
     public string Name { get; private set; }
     public string Description { get; private set; } = string.Empty;
     private readonly List<WorkItem> _workItems = new();
     public IReadOnlyCollection<WorkItem> WorkItems => _workItems.AsReadOnly();
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
     public ProjectStatus Status { get; private set; } = ProjectStatus.New;
 
     // DDD: Private constructor for EF Core
-    private Project() { }
+    private Project()
+    {
+        Name = string.Empty;
+    }
 
     // DDD: Public constructor for new Project
     public Project(string name, string description, IEnumerable<WorkItem> workItems)
@@ -26,8 +28,6 @@ public class Project
         {
             AddWorkItem(wi);
         }
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = CreatedAt;
         Status = ProjectStatus.New;
     }
 

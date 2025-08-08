@@ -8,8 +8,19 @@ using MicroTasks.ProjectApi.Auth;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.AddServiceDefaults();
-builder.Services.AddDbContext<ProjectDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("projectdb")));
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddSingleton<ICurrentDateTimeService, CurrentDateTimeService>();
+builder.Services.AddScoped<AuditEntitySaveChangesInterceptor>();
+
+builder.Services.AddDbContext<ProjectDbContext>((sp, options) =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("projectdb"));
+    var interceptor = sp.GetRequiredService<AuditEntitySaveChangesInterceptor>();
+    options.AddInterceptors(interceptor);
+});
+
 
 if (Environment.GetEnvironmentVariable("ASPIRE_TEST_AUTH") == "1")
 {

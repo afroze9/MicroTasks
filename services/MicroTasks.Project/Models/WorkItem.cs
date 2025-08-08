@@ -1,14 +1,12 @@
+using MicroTasks.Core;
 namespace MicroTasks.ProjectApi.Models;
 
-public class WorkItem
+public class WorkItem : BaseEntity
 {
-    public Guid Id { get; private set; }
     public Guid ProjectId { get; private set; }
     public string Title { get; private set; }
     public string Description { get; private set; } = string.Empty;
     public WorkItemStatus Status { get; private set; } = WorkItemStatus.New;
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
 
     // DDD: Private constructor for EF Core
@@ -22,8 +20,6 @@ public class WorkItem
         Title = title;
         Description = description;
         Status = WorkItemStatus.New;
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = CreatedAt;
     }
 
     // Business logic
