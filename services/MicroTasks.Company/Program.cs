@@ -6,6 +6,8 @@ using Keycloak.AuthServices.Authorization;
 using MicroTasks.CompanyApi.Auth;
 using MassTransit;
 using MicroTasks.Events.CompanyApi;
+using MicroTasks.CompanyApi.Consumers;
+using MicroTasks.Events;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -61,9 +63,20 @@ builder.Services.AddMassTransit(options =>
         rider.AddProducer<CompanyCreatedEvent>(nameof(CompanyCreatedEvent));
         rider.AddProducer<CompanyUpdatedEvent>(nameof(CompanyUpdatedEvent));
         rider.AddProducer<CompanyDeletedEvent>(nameof(CompanyDeletedEvent));
+        rider.AddConsumer<ProjectCreatedEventConsumer>();
+        rider.AddConsumer<ProjectDeletedEventConsumer>();
+
         rider.UsingKafka((context, k) =>
         {
             k.Host(builder.Configuration.GetConnectionString("kafka"));
+            k.TopicEndpoint<ProjectCreatedEvent>(nameof(ProjectCreatedEvent), $"company-api-{nameof(ProjectCreatedEvent)}", e =>
+            {
+                e.ConfigureConsumer<ProjectCreatedEventConsumer>(context);
+            });
+            k.TopicEndpoint<ProjectDeletedEvent>(nameof(ProjectDeletedEvent), $"company-api-{nameof(ProjectDeletedEvent)}", e =>
+            {
+                e.ConfigureConsumer<ProjectDeletedEventConsumer>(context);
+            });
         });
     });
 });

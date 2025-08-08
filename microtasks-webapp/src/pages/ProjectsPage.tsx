@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useProjectService } from "../services/projectService";
+import { useCompanyService } from "../services/companyService";
+import type { Company } from "../types/companyTypes";
 import { useAuth } from "../auth/useAuth";
 import { Link } from "react-router-dom";
 import { DataGrid, type GridRenderCellParams } from "@mui/x-data-grid";
@@ -36,6 +38,8 @@ const PROJECT_STATUS_OPTIONS: ProjectStatus[] = [
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [formCompanyId, setFormCompanyId] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -46,6 +50,7 @@ export default function ProjectsPage() {
 
   const { fetchProjects, createProject, updateProject, deleteProject } =
     useProjectService();
+  const { fetchCompanies } = useCompanyService();
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -57,13 +62,19 @@ export default function ProjectsPage() {
         setError(result.error);
       }
     });
-  }, [isAuthenticated, fetchProjects]);
+    fetchCompanies().then((result) => {
+      if (result.success) {
+        setCompanies(result.data);
+      }
+    });
+  }, [isAuthenticated, fetchProjects, fetchCompanies]);
 
   const handleOpenCreate = () => {
     setEditingProject(null);
     setFormName("");
     setFormDescription("");
     setFormStatus("New");
+    setFormCompanyId(companies.length > 0 ? companies[0].id : "");
     setDialogOpen(true);
   };
 
@@ -72,6 +83,9 @@ export default function ProjectsPage() {
     setFormName(project.name);
     setFormDescription(project.description || "");
     setFormStatus(project.status || "New");
+    setFormCompanyId(
+      project.companyId || (companies.length > 0 ? companies[0].id : "")
+    );
     setDialogOpen(true);
   };
 
@@ -81,6 +95,7 @@ export default function ProjectsPage() {
     setFormName("");
     setFormDescription("");
     setFormStatus("New");
+    setFormCompanyId(companies.length > 0 ? companies[0].id : "");
   };
 
   const handleSave = async () => {
@@ -88,6 +103,7 @@ export default function ProjectsPage() {
       name: formName,
       description: formDescription,
       status: formStatus,
+      companyId: formCompanyId,
     };
     let result;
     if (editingProject) {
@@ -243,6 +259,20 @@ export default function ProjectsPage() {
           {editingProject ? "Edit Project" : "Create Project"}
         </DialogTitle>
         <DialogContent>
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Company</InputLabel>
+            <Select
+              label="Company"
+              value={formCompanyId}
+              onChange={(e) => setFormCompanyId(e.target.value as string)}
+            >
+              {companies.map((company) => (
+                <MenuItem key={company.id} value={company.id}>
+                  {company.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <TextField
             label="Name"
             value={formName}

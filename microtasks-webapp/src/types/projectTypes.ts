@@ -10,6 +10,7 @@ export type Project = {
   name: string;
   description: string;
   status: ProjectStatus;
+  companyId: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -18,6 +19,7 @@ export type ProjectDto = {
   name: string;
   description: string;
   status: ProjectStatus;
+  companyId: string;
 };
 
 export type WorkItemStatus = "NotStarted" | "Active" | "Completed" | "Blocked";
