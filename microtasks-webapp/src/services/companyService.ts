@@ -1,31 +1,7 @@
 import { useAuth } from "../auth/useAuth";
 import { useCallback } from "react";
-
-export type Tag = {
-  id: string; // Guid
-  value: string;
-};
-
-export type Company = {
-  id: string; // Guid
-  name: string;
-  tags: Tag[];
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-export type TagDto = {
-  value: string;
-};
-
-export type CompanyDto = {
-  name: string;
-  tags?: TagDto[];
-};
-
-type ServiceResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+import type { Company, CompanyDto } from "../types/companyTypes";
+import type { ServiceResult } from "../types/ServiceResult";
 
 export const useCompanyService = () => {
   const { token } = useAuth();

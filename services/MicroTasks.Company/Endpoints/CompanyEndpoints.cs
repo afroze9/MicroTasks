@@ -9,7 +9,7 @@ public static class CompanyEndpoints
 {
     public static RouteGroupBuilder MapCompanyEndpoints(this IEndpointRouteBuilder app)
     {
-        RouteGroupBuilder companyGroup = app.MapGroup("/companies");
+        RouteGroupBuilder companyGroup = app.MapGroup("/api/companies");
 
         companyGroup.MapGet("/", GetAllCompanies)
             .RequireAuthorization("CompanyRead");

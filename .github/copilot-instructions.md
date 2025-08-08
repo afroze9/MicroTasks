@@ -1,68 +1,65 @@
-# General Instructions for Copilot
+# Copilot Instructions for MicroTasks Codebase
 
-You are an expert .NET Engineer and Architect.
-This project is going to be a Microservice-based application using .NET 9.
-We are using .NET Aspire as the base framework.
-We will need to follow a vertical slice architecture for the microservices.
-Make sure to use the appropriate folder structure for the project.
+## Big Picture Architecture
 
-# Copilot Instructions for MicroTasks
-
-## Project Overview
-
-- **MicroTasks** is a .NET Aspire-based solution for managing tasks, structured as a multi-service application.
-- Main components:
-  - `MicroTasks.AppHost`: Application host and entry point.
-  - `services/MicroTasks.Company`: Example service with a `TodoItem` model and CRUD endpoints.
-  - `MicroTasks.ServiceDefaults`: Shared service extensions and defaults.
-
-## Architecture & Patterns
-
-- **Service Boundaries**: Each service (e.g., `MicroTasks.Company`) is isolated in its own folder under `services/`.
-- **Models**: Domain models (e.g., `TodoItem`) are placed in a `Models/` subfolder within each service.
-- **DTOs**: Data Transfer Objects (DTOs) are placed in a `Dtos/` subfolder within each service. Use DTOs for request/response payloads and mapping between domain models and API contracts.
-- **Endpoints**: Minimal API pattern using endpoint groups (`app.MapGroup`) for RESTful operations.
-- **Data Storage**: In-memory `ConcurrentDictionary` is used for demo purposes; replace with persistent storage for production.
-- **Configuration**: Service-specific settings in `appsettings.json` and `appsettings.Development.json`.
-- **Migrations**: For services using Entity Framework Core, place migration files in a `Migrations/` subfolder within each service. Use migrations to manage schema changes for each service's DbContext. Run migrations using standard EF Core CLI commands, targeting the specific service project.
+- **MicroTasks** is a multi-service solution using .NET Aspire for backend and React+TypeScript+Vite for frontend.
+- **Backend**: Each microservice (e.g., Company, Project, WorkItem) lives in its own folder under `services/`, with vertical slice architecture (Models, DTOs, Endpoints, Data, Auth, etc.).
+- **Frontend**: The webapp (`microtasks-webapp/`) uses React, MUI, and TypeScript. Service boundaries are reflected in API service files and page components.
+- **Data Flow**: RESTful APIs connect frontend and backend. DTOs abstract domain models from API contracts. Auth is handled via Keycloak and Aspire.AuthServices.
 
 ## Developer Workflows
 
-- **Build**: Use `dotnet build MicroTasks.sln` from the workspace root.
-- **Run**: Launch services via `dotnet run --project services/MicroTasks.Company` or use the AppHost for orchestration.
-- **Debug**: Attach debugger to running service or AppHost; launch profiles in `Properties/launchSettings.json`.
-- **Test**: (No test projects detected; add under `tests/` if needed.)
+- **Build**: Run `dotnet build MicroTasks.sln` for backend; use `pnpm install` and `pnpm dev` for frontend.
+- **Run**: Launch backend services via AppHost or individual service projects. Frontend runs with Vite (`pnpm dev`).
+- **Test**: Backend tests are in `tests/` (xUnit, AspireHostFixture). Run with `dotnet test`. Frontend tests not present.
+- **Debug**: Attach to running .NET service or AppHost; use launch profiles in `Properties/launchSettings.json`.
 
-## Conventions & Integration
+## Project-Specific Patterns & Conventions
 
-- **Endpoints**: Grouped by resource (e.g., `/todos` for `TodoItem` CRUD).
-- **OpenAPI**: Enabled in development via `app.MapOpenApi()`.
-- **Service Defaults**: Use `builder.AddServiceDefaults()` for common configuration.
-- **External Dependencies**: NuGet packages managed per project; see `.csproj` files.
+- **Service Structure**: Each service has `Models/`, `Dtos/`, `Endpoints/`, `Data/`, `Auth/`, and `Program.cs`.
+- **DTOs**: Always place DTOs in `Dtos/` and keep them simple. Use DTOs for all API payloads.
+- **Endpoints**: Use Minimal API (`app.MapGroup`) and group by resource. Enable OpenAPI in dev.
+- **Frontend API Services**: Place API logic in `src/services/`, using a `ServiceResult<T>` pattern for error handling (see `companyService.ts`, `projectService.ts`, `workitemService.ts`).
+- **Shared Types**: Place reusable types in `src/types/` (e.g., `companyTypes.ts`, `projectTypes.ts`, `ServiceResult.ts`).
+- **Error Handling**: Use `ServiceResult<T>` for all service methods, never throw errors directly.
+- **Auth**: Use Keycloak for authentication/authorization. Frontend uses `useAuth` for role checks.
+- **UI Patterns**: Use MUI DataGrid for listings, dialogs for create/edit, and role-based controls for actions.
 
-## DTOs Folder Convention
+## Integration Points & External Dependencies
 
-- Place all DTO classes (e.g., `CompanyDto`, `TagDto`) in the `Dtos/` subfolder within each service.
-- Use DTOs for:
-  - Defining request and response shapes for API endpoints
-  - Abstracting domain models from external contracts
-  - Supporting mapping between models and API payloads
-- Keep DTOs simple and focused on serialization needs; avoid business logic in DTOs.
+- **Backend**: Uses EF Core, Npgsql, Aspire.ServiceDefaults, Aspire.AuthServices, Swashbuckle for OpenAPI.
+- **Frontend**: Uses React, MUI, Vite, TypeScript, pnpm, and custom hooks for auth.
+- **Communication**: RESTful APIs, DTO mapping, and role-based access control.
 
-## Example: TodoItem CRUD
+## Key Files & Directories
 
-- Model: `services/MicroTasks.Company/Models/TodoItem.cs`
-- Endpoints: Defined in `services/MicroTasks.Company/Program.cs`:
-  - `GET /todos` - List all
-  - `GET /todos/{id}` - Get by ID
-  - `POST /todos` - Create
-  - `PUT /todos/{id}` - Update
-  - `DELETE /todos/{id}` - Delete
+- `services/` - Backend microservices (Company, Project, WorkItem)
+- `microtasks-webapp/src/pages/` - React pages (CompaniesPage, ProjectsPage)
+- `microtasks-webapp/src/services/` - API service files (companyService.ts, projectService.ts, workitemService.ts)
+- `microtasks-webapp/src/types/` - Shared types (DTOs, ServiceResult)
+- `.github/instructions/` - Project-specific instructions for AI agents
+- `README.md` - General project info
 
-## Recommendations for AI Agents
+## Example Patterns
 
-- Follow the minimal API and endpoint group pattern for new resources.
-- Place models in `Models/`, endpoints in `Program.cs`.
-- Use in-memory collections for demo; abstract for real data stores.
-- Reference `MicroTasks.ServiceDefaults` for shared logic.
-- Update this file with new conventions as the project evolves.
+- **ServiceResult Usage**:
+  ```typescript
+  // src/services/companyService.ts
+  export async function fetchCompanies(): Promise<ServiceResult<Company[]>> {
+    const response = await fetch("/companies");
+    if (!response.ok) {
+      const errorText = await response.text();
+      return { success: false, error: errorText };
+    }
+    const companies = await response.json();
+    return { success: true, data: companies };
+  }
+  ```
+- **DTO Placement**:
+  - Place all DTOs in `Dtos/` (backend) or `src/types/` (frontend).
+- **Minimal API Grouping**:
+  - Use `app.MapGroup("/resource")` for endpoint grouping in backend services.
+
+---
+
+If any section is unclear or missing, please provide feedback so instructions can be improved for your team and future AI agents.

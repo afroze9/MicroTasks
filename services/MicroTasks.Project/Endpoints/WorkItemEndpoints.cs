@@ -9,7 +9,7 @@ public static class WorkItemEndpoints
 {
     public static void MapWorkItemEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/workitems");
+        var group = app.MapGroup("/api/workitems");
 
         group.MapGet("/", GetAllWorkItemsAsync)
             .RequireAuthorization("WorkItemRead");
@@ -21,11 +21,26 @@ public static class WorkItemEndpoints
             .RequireAuthorization("WorkItemWrite");
         group.MapDelete("/{id}", DeleteWorkItemAsync)
             .RequireAuthorization("WorkItemDelete");
+
+        var projectsGroup = app.MapGroup("/api/projects");
+        projectsGroup.MapGet("/{projectId}/workitems", GetWorkItemsByProjectIdAsync)
+            .RequireAuthorization("WorkItemRead")
+            .WithName("GetProjectWorkItems")
+            .WithOpenApi();
     }
 
     private static async Task<IResult> GetAllWorkItemsAsync(ProjectDbContext db)
     {
         var workItems = await db.WorkItems.ToListAsync();
+        var result = workItems.Select(WorkItemDtoExtensions.FromEntity);
+        return Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetWorkItemsByProjectIdAsync(Guid projectId, ProjectDbContext db)
+    {
+        var workItems = await db.WorkItems
+            .Where(wi => wi.ProjectId == projectId)
+            .ToListAsync();
         var result = workItems.Select(WorkItemDtoExtensions.FromEntity);
         return Results.Ok(result);
     }

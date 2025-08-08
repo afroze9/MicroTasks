@@ -12,7 +12,7 @@ public static class ProjectEndpoints
 
     public static void MapProjectEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/projects");
+        var group = app.MapGroup("/api/projects");
 
         group.MapGet("/", GetAllProjectsAsync)
             .RequireAuthorization("ProjectRead");
