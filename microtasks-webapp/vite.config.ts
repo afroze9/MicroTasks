@@ -8,10 +8,17 @@ export default defineConfig({
     port: parseInt(process.env.PORT || "3000", 10),
     proxy: {
       // Proxy API requests to the backend service
-      "/companies": {
+      "/api/companies": {
         target:
           process.env.services__company__https__0 ||
           process.env.services__company__http__0,
+        changeOrigin: true,
+        secure: false,
+      },
+      "/api/projects": {
+        target:
+          process.env.services__project__https__0 ||
+          process.env.services__project__http__0,
         changeOrigin: true,
         secure: false,
       },

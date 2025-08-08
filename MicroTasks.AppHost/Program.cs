@@ -2,7 +2,8 @@ IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(ar
 
 IResourceBuilder<KeycloakResource> keycloak = builder
     .AddKeycloak("keycloak", 9173)
-    .WithDataBindMount(@"I:\Keycloak\Data");
+    .WithDataBindMount(@"I:\Keycloak\Data")
+    .WithLifetime(ContainerLifetime.Persistent);
 
 IResourceBuilder<PostgresServerResource> companyDb = builder
     .AddPostgres("companydb")

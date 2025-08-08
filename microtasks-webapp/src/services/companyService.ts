@@ -9,7 +9,7 @@ export const useCompanyService = () => {
   const fetchCompanies = useCallback(async (): Promise<
     ServiceResult<Company[]>
   > => {
-    const response = await fetch("/companies", {
+    const response = await fetch("/api/companies", {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
     if (!response.ok) {
@@ -29,7 +29,7 @@ export const useCompanyService = () => {
 
   const getCompanyById = useCallback(
     async (id: string): Promise<ServiceResult<Company>> => {
-      const response = await fetch(`/companies/${id}`, {
+      const response = await fetch(`/api/companies/${id}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       if (!response.ok) {
@@ -51,7 +51,7 @@ export const useCompanyService = () => {
 
   const createCompany = useCallback(
     async (dto: CompanyDto): Promise<ServiceResult<Company>> => {
-      const response = await fetch("/companies", {
+      const response = await fetch("/api/companies", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +78,7 @@ export const useCompanyService = () => {
 
   const updateCompany = useCallback(
     async (id: string, dto: CompanyDto): Promise<ServiceResult<Company>> => {
-      const response = await fetch(`/companies/${id}`, {
+      const response = await fetch(`/api/companies/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +105,7 @@ export const useCompanyService = () => {
 
   const deleteCompany = useCallback(
     async (id: string): Promise<ServiceResult<null>> => {
-      const response = await fetch(`/companies/${id}`, {
+      const response = await fetch(`/api/companies/${id}`, {
         method: "DELETE",
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });

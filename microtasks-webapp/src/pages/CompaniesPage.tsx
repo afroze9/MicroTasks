@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useCompanyService } from "../services/companyService";
-import type { Company } from "../services/companyService";
 import { useAuth } from "../auth/useAuth";
 import { Link } from "react-router-dom";
 import { DataGrid, type GridRenderCellParams } from "@mui/x-data-grid";
@@ -22,6 +21,7 @@ import {
   Typography,
   Button,
 } from "@mui/material";
+import type { Company } from "../types/companyTypes";
 
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -159,6 +159,13 @@ export default function CompaniesPage() {
           rows={companies}
           columns={[
             { field: "name", headerName: "Name", flex: 1 },
+            {
+              field: "projectCount",
+              headerName: "Project Count",
+              flex: 1,
+              renderCell: (params: GridRenderCellParams<Company>) =>
+                params.row.projectCount ?? "-",
+            },
             {
               field: "createdAt",
               headerName: "Created At",

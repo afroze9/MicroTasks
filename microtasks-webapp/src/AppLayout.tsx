@@ -144,7 +144,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
           component="main"
           sx={{
             flexGrow: 1,
-            p: 2,
+            p: 4,
             width: { sm: `calc(100% - ${drawerWidth}px)` },
             mt: 2,
           }}
