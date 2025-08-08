@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+import { useProjectService } from "../services/projectService";
+import { useAuth } from "../auth/useAuth";
+import { Link } from "react-router-dom";
+import { DataGrid, type GridRenderCellParams } from "@mui/x-data-grid";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Dialog,
   DialogTitle,
@@ -6,120 +14,131 @@ import {
   DialogActions,
   TextField,
   Box,
+  IconButton as MuiIconButton,
   Container,
+  Stack,
+  Typography,
   Button,
-  Chip,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
-import {
-  DataGrid as MuiDataGrid,
-  type GridRenderCellParams,
-} from "@mui/x-data-grid";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CloseIcon from "@mui/icons-material/Close";
-import { IconButton as MuiIconButton } from "@mui/material";
-import { useAuth } from "../auth/useAuth";
+import type { Project, ProjectStatus } from "../types/projectTypes";
 
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-}
+const PROJECT_STATUS_OPTIONS: ProjectStatus[] = [
+  "New",
+  "Active",
+  "Completed",
+  "Archived",
+  "Cancelled",
+];
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [formName, setFormName] = useState("");
   const [formDescription, setFormDescription] = useState("");
-  const [formStatus, setFormStatus] = useState("");
-  const { hasRole, isInRoles } = useAuth();
+  const [formStatus, setFormStatus] = useState<ProjectStatus>("New");
+  const { isAuthenticated, hasRole, isInRoles } = useAuth();
+
+  const { fetchProjects, createProject, updateProject, deleteProject } =
+    useProjectService();
 
   useEffect(() => {
-    fetch("/projects")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch projects");
-        return res.json();
-      })
-      .then(setProjects)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+    if (!isAuthenticated) return;
+    fetchProjects().then((result) => {
+      if (result.success) {
+        setProjects(result.data);
+        setError("");
+      } else {
+        setError(result.error);
+      }
+    });
+  }, [isAuthenticated, fetchProjects]);
 
   const handleOpenCreate = () => {
     setEditingProject(null);
     setFormName("");
     setFormDescription("");
-    setFormStatus("");
+    setFormStatus("New");
     setDialogOpen(true);
   };
 
-  const handleOpenEdit = (project: Project) => {
+  const handleOpenEdit = async (project: Project) => {
     setEditingProject(project);
     setFormName(project.name);
-    setFormDescription(project.description);
-    setFormStatus(project.status);
+    setFormDescription(project.description || "");
+    setFormStatus(project.status || "New");
     setDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
+    setEditingProject(null);
+    setFormName("");
+    setFormDescription("");
+    setFormStatus("New");
   };
 
   const handleSave = async () => {
-    const payload = {
+    const dto = {
       name: formName,
       description: formDescription,
       status: formStatus,
     };
-    try {
-      if (editingProject) {
-        // Update
-        const res = await fetch(`/projects/${editingProject.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error("Failed to update project");
+    let result;
+    if (editingProject) {
+      result = await updateProject(editingProject.id, dto);
+    } else {
+      result = await createProject(dto);
+    }
+    if (result.success) {
+      const updated = await fetchProjects();
+      if (updated.success) {
+        setProjects(updated.data);
+        setError("");
       } else {
-        // Create
-        const res = await fetch(`/projects`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error("Failed to create project");
+        setError(updated.error);
       }
-      // Refresh
-      const res = await fetch("/projects");
-      setProjects(await res.json());
       handleCloseDialog();
-    } catch (err: any) {
-      setError(err.message);
+    } else {
+      setError(result.error);
     }
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const res = await fetch(`/projects/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete project");
-      setProjects(projects.filter((p) => p.id !== id));
-    } catch (err: any) {
-      setError(err.message);
+    if (!window.confirm("Are you sure you want to delete this project?"))
+      return;
+    const result = await deleteProject(id);
+    if (result.success) {
+      const updated = await fetchProjects();
+      if (updated.success) {
+        setProjects(updated.data);
+        setError("");
+      } else {
+        setError(updated.error);
+      }
+    } else {
+      setError(result.error);
     }
   };
 
+  if (!isAuthenticated) {
+    return <p>Please log in to view projects.</p>;
+  }
+
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <Box sx={{ flexGrow: 1 }}>
-          <h1>Projects</h1>
-        </Box>
+    <Container sx={{ mb: 4 }}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ mb: 2 }}
+      >
+        <Typography variant="h4">Projects</Typography>
         {isInRoles("project-api", [
           "project_manager",
           "project_contributor",
@@ -127,37 +146,54 @@ export default function ProjectsPage() {
           <Button
             variant="contained"
             color="primary"
+            startIcon={<AddIcon />}
             onClick={handleOpenCreate}
           >
-            Create Project
+            Create New Project
           </Button>
         )}
-      </Box>
-      {error && <Box sx={{ color: "error.main", mb: 2 }}>{error}</Box>}
-      <Box sx={{ height: 500, width: "100%" }}>
-        <MuiDataGrid
+      </Stack>
+      <Link to="/">Go to Home</Link>
+
+      {error && <Typography color="error">{error}</Typography>}
+
+      <Box sx={{ height: 600, mt: 2 }}>
+        <DataGrid<Project>
           rows={projects}
           columns={[
             { field: "name", headerName: "Name", flex: 1 },
-            { field: "description", headerName: "Description", flex: 2 },
-            { field: "status", headerName: "Status", flex: 1 },
+            {
+              field: "description",
+              headerName: "Description",
+              flex: 1,
+            },
+            {
+              field: "status",
+              headerName: "Status",
+              flex: 1,
+            },
             {
               field: "createdAt",
               headerName: "Created At",
               flex: 1,
-              valueFormatter: (params) =>
-                new Date(params.value).toLocaleString(),
+              renderCell: (params: GridRenderCellParams<Project>) => {
+                const date = params.row.createdAt;
+                return date ? new Date(date).toLocaleString() : "-";
+              },
             },
             {
               field: "updatedAt",
               headerName: "Updated At",
               flex: 1,
-              valueFormatter: (params) =>
-                new Date(params.value).toLocaleString(),
+              renderCell: (params: GridRenderCellParams<Project>) => {
+                const date = params.row.updatedAt;
+                return date ? new Date(date).toLocaleString() : "-";
+              },
             },
             {
               field: "actions",
               headerName: "Actions",
+              flex: 1,
               sortable: false,
               filterable: false,
               align: "right",
@@ -221,13 +257,20 @@ export default function ProjectsPage() {
             fullWidth
             sx={{ mb: 2 }}
           />
-          <TextField
-            label="Status"
-            value={formStatus}
-            onChange={(e) => setFormStatus(e.target.value)}
-            fullWidth
-            sx={{ mb: 2 }}
-          />
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Status</InputLabel>
+            <Select
+              label="Status"
+              value={formStatus}
+              onChange={(e) => setFormStatus(e.target.value as ProjectStatus)}
+            >
+              {PROJECT_STATUS_OPTIONS.map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button

@@ -18,6 +18,7 @@ import {
   ListItemButton,
 } from "@mui/material";
 import BusinessIcon from "@mui/icons-material/Business";
+import FolderIcon from "@mui/icons-material/Folder";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
@@ -53,6 +54,14 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
               <BusinessIcon />
             </ListItemIcon>
             <ListItemText primary="Companies" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/projects">
+            <ListItemIcon>
+              <FolderIcon />
+            </ListItemIcon>
+            <ListItemText primary="Projects" />
           </ListItemButton>
         </ListItem>
       </List>

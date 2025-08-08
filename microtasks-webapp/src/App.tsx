@@ -5,6 +5,7 @@ import KeycloakProvider from "./auth/KeycloakProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Keycloak from "keycloak-js";
 import AppLayout from "./AppLayout";
+import ProjectsPage from "./pages/ProjectsPage";
 
 const keycloak = new Keycloak({
   url: "http://localhost:9173",
@@ -52,6 +53,21 @@ const App = () => {
                   ]}
                 >
                   <CompaniesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/projects"
+              element={
+                <ProtectedRoute
+                  resource="project-api"
+                  roles={[
+                    "project_viewer",
+                    "project_manager",
+                    "project_contributor",
+                  ]}
+                >
+                  <ProjectsPage />
                 </ProtectedRoute>
               }
             />
